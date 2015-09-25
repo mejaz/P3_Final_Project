@@ -1,0 +1,22 @@
+{% extends "layout.html" %}
+{% block head %}
+	<title>Catalog - Edit Item</title>
+{% endblock %}
+{% block body %}
+	<div class="row subtitle">
+		
+			<a href="{{url_for('displayCatalog')}}">Home</a>
+		
+	</div>	
+	
+	<h3>Edit Item</h3>
+
+	<form action="{{url_for('editItem', catagory_name=catagory_name, item_name=item.item_name)}}" method='POST'>
+		<label><b>Title</b></label><br />
+		<input type='textbox' name='items_name' value='{{item.item_name}}'> <br /> <br />
+		<label><b>Description</b></label><br />
+		<input type='textbox' name='items_desc' value='{{item.item_desc}}'> <br /> <br />
+		<input type='submit' value='Submit'>
+		<a href="{{url_for('displayCatagoryItems', catagory_name=catagory_name)}}">Cancel</a>
+	</form>
+{% endblock %}

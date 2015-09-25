@@ -1,0 +1,16 @@
+{% extends "layout.html" %}
+{% block head %}
+	<title>Catalog - Item Description</title>
+{% endblock %}
+{% block body %}
+	<div class="row subtitle">
+		<a href="{{url_for('displayCatalog')}}">Home</a>
+	</div>
+	
+	<table>
+		<tr><td><h3>{{item.item_name}}</h3></td></tr>
+
+		<tr><td><p>{{item.item_desc}}</p></td></tr>
+	</table>
+	
+{% endblock %}

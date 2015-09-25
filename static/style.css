@@ -1,0 +1,49 @@
+.container {
+	min-height: 100%;
+	min-width: 100%;
+
+}
+
+body {
+	background-color: lightgreen;
+}
+.heading {
+	text-align: center;
+	background-color: lightblue;
+	color:green;
+	padding: 1%;
+	
+}
+.subtitle {
+	background-color: orange;
+	text-align: right;
+	padding: 5px;
+	padding-right: 35px;
+	
+
+}
+
+.content {
+	background-color: lightgrey;
+	text-align: center;
+	height: 80vh;
+
+}
+
+#loginbutton {
+
+	margin-top: auto;
+	margin-bottom: auto;
+	
+}
+
+table {
+	margin-left: auto;
+	margin-right: auto;
+	background-color: white;
+}
+
+table td {
+	vertical-align: top;
+}
+

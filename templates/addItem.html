@@ -1,0 +1,32 @@
+{% extends "layout.html" %}
+{% block head %}
+	<title>Catalog - Add Item</title>
+{% endblock %}
+{% block body %}
+	<div class="row subtitle">
+		
+			<a href="{{url_for('displayCatalog')}}">Home</a>
+		
+	</div>	
+	
+	<h3>Add Item</h3><br />
+
+
+	<form action="{{url_for('addItem')}}" method='POST'>
+		Select catagory : 
+
+		<select name='catg_name'>
+			{% for i in catagory %}
+				<option value='{{i.catagory_name}}'>{{i.catagory_name}}</option>
+			{% endfor %}
+		</select>
+		<br/><br/>
+		
+		Enter Item name : <input type='textbox' name='addedItem'> <br /><br/>
+		Enter Item Description : <input type='textbox' name='addedItemDesc'> <br /><br/>
+		
+		<input type='submit' value='Submit'>
+		<input type='button' value='Cancel'>
+
+	</form>
+{% endblock %}
