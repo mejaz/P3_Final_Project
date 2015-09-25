@@ -36,11 +36,11 @@ session = DBSession()
 
 def showLogin():
     """ Retruns a state  token with random uppercase letter and digits to login template """
-	state = ''.join(random.choice(string.ascii_uppercase + string.digits)
+    state = ''.join(random.choice(string.ascii_uppercase + string.digits)
 		 for x in xrange(32))
-	login_session['state'] = state
+    login_session['state'] = state
 
-	return render_template('login.html', STATE=state)
+    return render_template('login.html', STATE=state)
 
 # Routing to Google+ login button.
 
@@ -212,16 +212,16 @@ def displayCatalogonLogin():
 @app.route('/catalog/<string:catagory_name>/items')
 
 def displayCatagoryItems(catagory_name):
-	all_catagories = session.query(Catagory).all()
+    all_catagories = session.query(Catagory).all()
 
     # Selected catagory.
 	
     sel_cat = session.query(Catagory).filter_by(catagory_name=catagory_name).one()
 	
-	if 'username' not in login_session:
+    if 'username' not in login_session:
 		catagory_items = session.query(Items).filter_by(catagory_id_fk=sel_cat.catagory_id).all()
 		return render_template('catagoryItems.html', all_catagories=all_catagories, all_items=catagory_items, sel_cat=sel_cat)
-	else:
+    else:
 		catagory_items = session.query(Items).filter_by(catagory_id_fk=sel_cat.catagory_id, user_id_fk=login_session['email']).all()
 		return render_template('catagoryItems.html', all_catagories=all_catagories, all_items=catagory_items, sel_cat=sel_cat)
 
@@ -251,8 +251,8 @@ def displayItemDesc(catagory_name, userid, item_name):
 @app.route('/catalog/<string:catagory_name>/<string:item_name>/delete', methods=['GET', 'POST'])
 def deleteItem(catagory_name, item_name):
 
-	if 'username' not in login_session:
-		return redirect('/login')
+    if 'username' not in login_session:
+        return redirect('/login')
 
     # Selected Catagory.
 
@@ -262,7 +262,7 @@ def deleteItem(catagory_name, item_name):
 
     sel_cat = session.query(Items).filter_by(catagory_id_fk=catagory.catagory_id, item_name=item_name).one()
 
-	if request.method == 'POST':
+    if request.method == 'POST':
 		print request.form['response']
 		if request.form['response'] == "Yes":
 			session.delete(sel_cat)
@@ -271,27 +271,27 @@ def deleteItem(catagory_name, item_name):
 			return redirect(url_for('displayCatagoryItems', catagory_name=catagory_name))
 		else:
 			return redirect(url_for('displayCatagoryItems', catagory_name=catagory_name))
-	else:
+    else:
 		return render_template('deleteItem.html', catagory_name=catagory_name, item_name=item_name)
 
 # Edit a selected item - authorized user
 @app.route('/catalog/<string:catagory_name>/<string:item_name>/edit', methods=['GET', 'POST'])
 def editItem(catagory_name, item_name):
 
-	if 'username' not in login_session:
+    if 'username' not in login_session:
 		return redirect('/login')
 
 
     # Seleected Catagory.
 
-	catagory = session.query(Catagory).filter_by(catagory_name=catagory_name).one()
+    catagory = session.query(Catagory).filter_by(catagory_name=catagory_name).one()
 	
     # Filtering the item to be edited.
 
     sel_cat = session.query(Items).filter_by(catagory_id_fk=catagory.catagory_id, item_name=item_name).one()
 
 
-	if request.method == 'POST':
+    if request.method == 'POST':
 
 		if request.form['items_name']:
 			
@@ -301,10 +301,10 @@ def editItem(catagory_name, item_name):
 			session.commit()
 			flash("Item edited successfully!")
 		return redirect(url_for('displayCatagoryItems', catagory_name=catagory_name))
-	else:
+    else:
 		return render_template('editItem.html', catagory_name=catagory_name, item=sel_cat)
 
-# Add a new item - authorized user
+# Add a new item - authorized users only
 @app.route('/catalog/addItem', methods=['GET', 'POST'])
 def addItem():
 
