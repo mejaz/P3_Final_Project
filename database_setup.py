@@ -12,8 +12,6 @@ class Usernames(Base):
 
 	# Creating a class for Table Usernames
 	user_id = Column(String, primary_key=True)
-	user_pic = Column(String, nullable=True)
-	user_password = Column(String, nullable=True)
 
 class Catagory(Base):
 	__tablename__ = 'catagory'
@@ -27,10 +25,11 @@ class Items(Base):
 
 	# Creating a class for Table Items
 	item_id = Column(Integer, primary_key=True)
-	item_name = Column(String, nullable=False)
+	item_name = Column(String, nullable=False, unique=True)
 	item_desc = Column(String, nullable=False)
+	ipicture = Column(String, nullable=True)
 	catagory_id_fk = Column(Integer, ForeignKey('catagory.catagory_id'))
-	catagory = relationship(Catagory)
+	catagory = relationship(Catagory, single_parent=True, cascade="all, delete-orphan")
 	user_id_fk = Column(Integer, ForeignKey('usernames.user_id'))
 	usernames = relationship(Usernames)
 
