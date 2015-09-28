@@ -25,32 +25,40 @@
 	{% endwith %}
 	</h3>
 
-	<table>
-	
-	<th><h3>Catagories</h3></th><th><h3>Latest Items</h3></th>
-	<tr>
-		<td>
-			<ul>
-				{% for i in all_catagories %}
+	<div class="row">
+		<div class="col-md-6">
+			<div><img src="{{img}}" alt="Profile pic" height=100px width=100px></div>
+		</div>
+		<div class="col-md-6">
+			<div class="pull-left">
+				<table>
+				<th><h3>Catagories</h3></th><th><h3>Latest Items</h3></th>
+				<tr>
+					<td>
+						<ul>
+							{% for i in all_catagories %}
 
-					<li><a href="{{url_for('displayCatagoryItems', catagory_name=i.catagory_name)}}"> {{i.catagory_name}} </a></br></br></li>
+								<li><a href="{{url_for('displayCatagoryItems', catagory_name=i.catagory_name)}}"> {{i.catagory_name}} </a></br></br></li>
 
-				{% endfor %}
-			</ul>
-		</td>
+							{% endfor %}
+						</ul>
+					</td>
 
-		<td>
-		
-			<ul>
-				{% for i in all_items %}
-					{% for j in all_catagories %}
-						{% if j.catagory_id == i.catagory_id_fk %}
-							<li> {{i.item_name}} ( {{j.catagory_name}} )</li></br>
-						{% endif %}
-					{% endfor %}
-				{% endfor %}
-			</ul>
-		</td>
-	</tr>
-	</table>
+					<td>
+					
+						<ul>
+							{% for i in all_items %}
+								{% for j in all_catagories %}
+									{% if j.catagory_id == i.catagory_id_fk %}
+										<li> {{i.item_name}} ( {{j.catagory_name}} )</li></br>
+									{% endif %}
+								{% endfor %}
+							{% endfor %}
+						</ul>
+					</td>
+				</tr>
+				</table>
+			</div>
+		</div>
+	</div>
 {% endblock %}

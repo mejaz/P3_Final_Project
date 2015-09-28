@@ -12,21 +12,60 @@
 	<h3>Add Item</h3><br />
 
 
-	<form action="{{url_for('addItem')}}" method='POST'>
-		Select catagory : 
+	<form action="{{url_for('addItem')}}" enctype="multipart/form-data" method='POST'>
+		<table>
 
-		<select name='catg_name'>
-			{% for i in catagory %}
-				<option value='{{i.catagory_name}}'>{{i.catagory_name}}</option>
-			{% endfor %}
-		</select>
-		<br/><br/>
-		
-		Enter Item name : <input type='textbox' name='addedItem'> <br /><br/>
-		Enter Item Description : <input type='textbox' name='addedItemDesc'> <br /><br/>
-		
-		<input type='submit' value='Submit'>
-		<input type='button' value='Cancel'>
+		<tr>
+			<td> 
+				Select catagory : 
+			</td>
 
+			<td>
+				<select name='catg_name'>
+				{% for i in catagory %}
+					<option value='{{i.catagory_name}}'>{{i.catagory_name}}</option>
+				{% endfor %}
+				</select>
+			</td>
+		</tr>
+		
+		<tr>
+			<td>
+				Enter Item name : 
+			</td>
+			<td>
+				<input type='textbox' name='addedItem'>
+			</td>
+		</tr>
+
+		<tr>
+			<td>
+				Enter Item Description : 
+			</td>
+			<td>
+				<input type='textbox' name='addedItemDesc'>
+			</td>
+		</tr>
+
+		<tr>
+			<td>
+				Select Item image:
+			</td>
+			<td>
+				<input type="file" name="file" id="itemImage">
+				<img id="dispItem" src="#" alt="no image to display" width=200 height=200>
+			</td>	
+		</tr>	
+
+		<tr>
+			<td></td>
+			<td>
+				<input type='submit' value='Submit'>
+
+				<input type='button' value='Cancel'>
+			</td>
+		</tr>
+
+		</table>
 	</form>
 {% endblock %}
