@@ -11,6 +11,7 @@
 		<tr><td><h3>{{item.item_name}}</h3></td></tr>
 
 		<tr><td><p>{{item.item_desc}}</p></td></tr>
+		<tr><td><img src="{{url_for('static', filename=item.ipicture)}}"><br /></td></tr>
 	</table>
 	
 {% endblock %}

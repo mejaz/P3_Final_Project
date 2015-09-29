@@ -1,8 +1,11 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
+
 import os
+from functools import wraps
+
 from flask import Flask, render_template, url_for, redirect, request, \
-    flash, jsonify
+    flash, jsonify, g
 app = Flask(__name__)
 
 from sqlalchemy import create_engine
@@ -35,7 +38,7 @@ import requests
 CLIENT_ID = json.loads(open('client_secrets.json', 'r').read())['web'
         ]['client_id']
 
-UPLOAD_FOLDER = "images/"
+UPLOAD_FOLDER = 'static/images/'
 ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
@@ -140,7 +143,7 @@ def gconnect():
 
     # Store the access token in the session for later use.
 
-    login_session['credentials'] = credentials
+    login_session['credentials'] = credentials.to_json()
     login_session['gplus_id'] = gplus_id
 
     # Get user info
@@ -155,6 +158,8 @@ def gconnect():
     login_session['picture'] = data['picture']
     login_session['email'] = data['email']
 
+    g.user = login_session['email']
+
     # Adding username to our Database.
     # Password is default to 12345 for every user.
 
@@ -167,8 +172,7 @@ def gconnect():
     if len(my_user) > 0:
         print 'user already exists'
     else:
-        user = Usernames(user_id=login_session['email'],
-                         user_pic=login_session['picture'])
+        user = Usernames(user_id=login_session['email'])
         session.add(user)
         session.commit()
 
@@ -199,7 +203,8 @@ def gdisconnect():
                           401)
         response.headers['Content-Type'] = 'application/json'
         return response
-    access_token = credentials.access_token
+    access_token = json.loads(credentials)
+    access_token = access_token['access_token']
     url = 'https://accounts.google.com/o/oauth2/revoke?token=%s' \
         % access_token
     h = httplib2.Http()
@@ -231,6 +236,28 @@ def gdisconnect():
         return response
 
 
+# load user
+
+@app.before_request
+def load_user():
+    if 'email' in login_session:
+        g.user = login_session['email']
+    else:
+        g.user = None
+
+
+# login decorator
+
+def login_required(f):
+
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if g.user is None:
+            return redirect(url_for('showLogin'))
+        return f(*args, **kwargs)
+    return decorated_function
+
+
 # Display home page.
 
 @app.route('/')
@@ -257,9 +284,8 @@ def displayCatalog():
 # User logged in
 
 @app.route('/catalogonLogin/')
+@login_required
 def displayCatalogonLogin():
-    if 'username' not in login_session:
-        return redirect('/login')
     all_catagories = session.query(Catagory).all()
 
     # Displaying only the latest 9 items.
@@ -340,15 +366,13 @@ def displayItemDesc(catagory_name, userid, item_name):
 
 @app.route('/catalog/<string:catagory_name>/<string:item_name>/delete',
            methods=['GET', 'POST'])
+@login_required
 def deleteItem(catagory_name, item_name):
-
-    if 'username' not in login_session:
-        return redirect('/login')
 
     # Selected Catagory.
 
     catagory = \
-            session.query(Catagory).filter_by(catagory_name=catagory_name).one()
+        session.query(Catagory).filter_by(catagory_name=catagory_name).one()
 
     #  Filtering the item to be deleted.
 
@@ -377,10 +401,8 @@ def deleteItem(catagory_name, item_name):
 
 @app.route('/catalog/<string:catagory_name>/<string:item_name>/edit',
            methods=['GET', 'POST'])
+@login_required
 def editItem(catagory_name, item_name):
-
-    if 'username' not in login_session:
-        return redirect('/login')
 
     # Seleected Catagory.
 
@@ -399,9 +421,11 @@ def editItem(catagory_name, item_name):
 
             sel_cat.item_name = request.form['items_name']
             sel_cat.item_desc = request.form['items_desc']
+
             session.add(sel_cat)
             session.commit()
             flash('Item edited successfully!')
+
         return redirect(url_for('displayCatagoryItems',
                         catagory_name=catagory_name))
     else:
@@ -413,56 +437,57 @@ def editItem(catagory_name, item_name):
 # Add a new item - authorized users only
 
 @app.route('/catalog/addItem', methods=['GET', 'POST'])
+@login_required
 def addItem():
 
-    if 'username' not in login_session:
-        return redirect('/login')
+    # Selecting all catagory names.
+
+    all_catagories = session.query(Catagory).all()
+
+    # Selecting all Items
+
+    all_items = session.query(Items).all()
+
+    if request.method == 'POST':
+        if request.form['addedItem']:
+
+            catToAdd = \
+                session.query(Catagory).filter_by(catagory_name=request.form['catg_name'
+                    ]).one()
+
+            username1 = \
+                session.query(Usernames).filter_by(user_id=login_session['email'
+                    ]).one()
+
+            file_picture = request.files['file']
+
+            if file_picture and allowed_file(file_picture.filename):
+
+                filename = secure_filename(file_picture.filename)
+                pic_path = os.path.join(app.config['UPLOAD_FOLDER'],
+                        filename)
+
+                file_picture.save(os.path.join(os.path.join(app.config['UPLOAD_FOLDER'
+                                  ], filename)))
+
+                item1 = Items(item_name=request.form['addedItem'],
+                              item_desc=request.form['addedItemDesc'],
+                              ipicture='images/' + filename,
+                              catagory=catToAdd, usernames=username1)
+
+                session.add(item1)
+                session.commit()
+                flash('Item successfully added.')
+
+        return redirect(url_for('displayCatalog'))
     else:
+        catagory = session.query(Catagory).all()
+        return render_template('addItem.html', catagory=catagory)
 
-        # Selecting all catagory names.
-
-        all_catagories = session.query(Catagory).all()
-
-        # Selecting all Items
-
-        all_items = session.query(Items).all()
-
-        if request.method == 'POST':
-            if request.form['addedItem']:
-
-                catToAdd = \
-                    session.query(Catagory).filter_by(catagory_name=request.form['catg_name'
-                        ]).one()
-
-                username1 = \
-                    session.query(Usernames).filter_by(user_id=login_session['email'
-                        ]).one()
-
-                file_picture = request.files['file']
-
-                if file_picture and allowed_file(file_picture.filename):
-
-                    filename = secure_filename(file_picture.filename)
-                    pic_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-                    print type(pic_path)
-                    print pic_path
-                    file_picture.save(os.path.join(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-
-                    item1 = Items(item_name=request.form['addedItem'], item_desc=request.form['addedItemDesc'], ipicture=pic_path, catagory=catToAdd, usernames=username1)
-
-                    session.add(item1)
-                    session.commit()
-                    flash('Item successfully added.')
-                    
-            return redirect(url_for('displayCatalog'))
-        else:
-            catagory = session.query(Catagory).all()
-            return render_template('addItem.html', catagory=catagory)
 
 def allowed_file(filename):
-    return "." in filename and \
-            filename.rsplit(".", 1)[1] in ALLOWED_EXTENSIONS
-
+    return '.' in filename and filename.rsplit('.', 1)[1] \
+        in ALLOWED_EXTENSIONS
 
 
 # API endpoint
@@ -488,13 +513,14 @@ def allItemsXML(catagory_name):
     catagory_items = \
         session.query(Items).filter_by(catagory_id_fk=selected_catagory.catagory_id).all()
 
-    json_output =  toXML([i.serialize for i in catagory_items])
+    json_output = toXML([i.serialize for i in catagory_items])
 
     return json_output
-
 
 if __name__ == '__main__':
     app.secret_key = 'super_secret_key'
     app.debug = True
     app.run(host='0.0.0.0', port=8000)
+
+
             

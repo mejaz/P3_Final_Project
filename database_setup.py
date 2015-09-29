@@ -28,8 +28,8 @@ class Items(Base):
 	item_name = Column(String, nullable=False, unique=True)
 	item_desc = Column(String, nullable=False)
 	ipicture = Column(String, nullable=True)
-	catagory_id_fk = Column(Integer, ForeignKey('catagory.catagory_id'))
-	catagory = relationship(Catagory, single_parent=True, cascade="all, delete-orphan")
+	catagory_id_fk = Column(Integer, ForeignKey('catagory.catagory_id', ondelete="CASCADE"))
+	catagory = relationship(Catagory)
 	user_id_fk = Column(Integer, ForeignKey('usernames.user_id'))
 	usernames = relationship(Usernames)
 

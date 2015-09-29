@@ -41,9 +41,25 @@ table {
 	margin-left: auto;
 	margin-right: auto;
 	background-color: white;
+
 }
 
 table td {
 	vertical-align: top;
+	padding: 5px;
+	border: 2px;
+	border-color: black;
+	border-width: 1px;
+	border-style: solid;
+}
+
+table th {
+	border-color: black;
+	border-width: 1px;
+	border-style: solid;
+	text-align: center;
+	background-color: lightblue;
+	color: green;
+	padding: 5px;
 }
 

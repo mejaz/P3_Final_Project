@@ -10,5 +10,6 @@
 	<h3>{{item.item_name}}</h3>
 
 	<p>{{item.item_desc}}</p>
+	<img src="{{url_for('static', filename=item.ipicture)}}"><br />
 	<a href="{{url_for('editItem', catagory_name=catagory_name, item_name=item.item_name)}}">Edit</a>&nbsp;&nbsp;|&nbsp;&nbsp;<a href="{{url_for('deleteItem', catagory_name=catagory_name, item_name=item.item_name)}}">Delete</a>
 {% endblock %}
