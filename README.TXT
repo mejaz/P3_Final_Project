@@ -51,7 +51,7 @@ e.g. To get the items under category 'Soccer',
 
 For a JSON response, use : http://localhost:8000/catalog/Soccer/items/JSON
 
-Similarly, for an XML response, use : /catalog/Soccer/items/XML
+Similarly, for an XML response, use : http://localhost:8000/catalog/Soccer/items/XML
 
 
 Contact Us:
